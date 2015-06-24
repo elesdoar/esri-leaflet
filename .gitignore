@@ -10,8 +10,12 @@ Icon
 *.sublime-project
 .idea/*
 
+# SASS
+.sass-cache
+
 # Node
 node_modules
+npm-debug.log
 
 # Coverage
 coverage
@@ -20,7 +24,16 @@ coverage
 .grunt/
 
 # Debugging Files
-debug.html
+working
+debug/*.html
+!debug/sample.html
 
-# Project Files
-.project
+# Docs Build
+site/build
+
+# Built Files
+dist/*
+!dist/README.md
+
+# Custom Gruntfile (for custom builds)
+Gruntfile.custom.js

@@ -1,307 +1,155 @@
-/* globals L */
-
-/*!
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Sanborn Map Company, Inc.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-L.esri.DynamicMapLayer = L.Class.extend({
-  includes: L.esri.Mixins.identifiableLayer,
+EsriLeaflet.Layers.DynamicMapLayer = EsriLeaflet.Layers.RasterLayer.extend({
 
   options: {
-    opacity: 1,
-    position: 'front'
-  },
-
-  _defaultLayerParams: {
+    updateInterval: 150,
+    layers: false,
+    layerDefs: false,
+    timeOptions: false,
     format: 'png24',
     transparent: true,
-    f: 'image',
-    bboxSR: 3875,
-    imageSR: 3875,
-    layers: ''
+    f: 'json'
   },
 
   initialize: function (url, options) {
-    this.serviceUrl = L.esri.Util.cleanUrl(url);
-    this._layerParams = L.Util.extend({}, this._defaultLayerParams);
-
-    for (var opt in options) {
-      if (options.hasOwnProperty(opt) && this._defaultLayerParams.hasOwnProperty(opt)) {
-        this._layerParams[opt] = options[opt];
-      }
+    options = options || {};
+    options.url = EsriLeaflet.Util.cleanUrl(url);
+    this._service = new EsriLeaflet.Services.MapService(options);
+    this._service.on('authenticationrequired requeststart requestend requesterror requestsuccess', this._propagateEvent, this);
+    if ((options.proxy || options.token) && options.f !== 'json'){
+      options.f = 'json';
     }
-
-    this._parseLayers();
-    this._parseLayerDefs();
-
-
     L.Util.setOptions(this, options);
-
-    if(!this._layerParams.transparent) {
-      this.options.opacity = 1;
-    }
-
-    this._getMetadata();
-
   },
 
-  _getMetadata: function(){
-   var requestOptions = {};
-
-    if(this.options.token){
-      requestOptions.token = this.options.token;
-    }
-
-    L.esri.get(this.serviceUrl, requestOptions, function(response){
-      // if there is a invalid token error...
-      if(response.error && (response.error.code === 499 || response.error.code === 498)) {
-
-        // if we have already asked for authentication
-        if(!this._authenticating){
-
-          // ask for authentication
-          this._authenticating = true;
-
-          // ask for authentication. developer should fire the retry() method with the new token
-          this.fire('authenticationrequired', {
-            retry: L.Util.bind(function(token){
-              // set the new token
-              this.options.token = token;
-
-              // get metadata again
-              this._getMetadata();
-
-              // reload the image so it shows up with the new token
-              this._update();
-            }, this)
-          });
-        }
-      } else {
-        this.fire("metadata", { metadata: response });
-      }
-
-    }, this);
+  getLayers: function(){
+    return this.options.layers;
   },
 
-  onAdd: function (map) {
-    this._map = map;
-    this._moveHandler = L.esri.Util.debounce(this._update, 150, this);
-
-    map.on("moveend", this._moveHandler, this);
-
-    if (map.options.crs && map.options.crs.code) {
-      var sr = map.options.crs.code.split(":")[1];
-      this._layerParams.bboxSR = sr;
-      this._layerParams.imageSR = sr;
-    }
-
+  setLayers: function(layers){
+    this.options.layers = layers;
     this._update();
-  },
-
-  onRemove: function (map) {
-    if (this._currentImage) { this._map.removeLayer(this._currentImage); }
-    map.off("moveend", this._moveHandler, this);
-  },
-
-  addTo: function (map) {
-    map.addLayer(this);
     return this;
   },
 
-  setOpacity: function(opacity){
-    this.options.opacity = opacity;
-    this._currentImage.setOpacity(opacity);
+  getLayerDefs: function(){
+    return this.options.layerDefs;
   },
 
-  bringToFront: function(){
-    this.options.position = 'front';
-    this._currentImage.bringToFront();
+  setLayerDefs: function(layerDefs){
+    this.options.layerDefs = layerDefs;
+    this._update();
     return this;
   },
 
-  bringToBack: function(){
-    this.options.position = 'back';
-    this._currentImage.bringToBack();
+  getTimeOptions: function(){
+    return this.options.timeOptions;
+  },
+
+  setTimeOptions: function(timeOptions){
+    this.options.timeOptions = timeOptions;
+    this._update();
     return this;
   },
-  
-  setZIndex: function (zIndex) {
-	this.options.zIndex = zIndex;
-	this._updateZIndex();
-	return this;
-  },
-  
-  _updateZIndex: function () {
-	if (this._currentImage && this._currentImage._image && this.options.zIndex !== undefined) {
-		this._currentImage._image.style.zIndex = this.options.zIndex;
-	}
+
+  query: function(){
+    return this._service.query();
   },
 
-  _parseLayers: function () {
-    if (typeof this._layerParams.layers === 'undefined') {
-      delete this._layerParams.layerOption;
-      return;
-    }
+  identify: function(){
+    return this._service.identify();
+  },
 
-    var action = this._layerParams.layerOption || null,
-        layers = this._layerParams.layers || null,
-        verb = 'show',
-        verbs = ['show', 'hide', 'include', 'exclude'];
+  find: function(){
+    return this._service.find();
+  },
 
-    delete this._layerParams.layerOption;
+  _getPopupData: function(e){
+    var callback = L.Util.bind(function(error, featureCollection, response) {
+      setTimeout(L.Util.bind(function(){
+        this._renderPopup(e.latlng, error, featureCollection, response);
+      }, this), 300);
+    }, this);
 
-    if (!action) {
-      if (layers instanceof Array) {
-        this._layerParams.layers = verb + ':' + layers.join(',');
-      } else if (typeof layers === 'string') {
-        var match = layers.match(':');
+    var identifyRequest = this.identify().on(this._map).at(e.latlng);
 
-        if (match) {
-          layers = layers.split(match[0]);
-          if (Number(layers[1].split(',')[0])) {
-            if (verbs.indexOf(layers[0]) !== -1) {
-              verb = layers[0];
-            }
-
-            layers = layers[1];
-          }
-        }
-        this._layerParams.layers = verb + ':' + layers;
-      }
+    if(this.options.layers){
+      identifyRequest.layers('visible:' + this.options.layers.join(','));
     } else {
-      if (verbs.indexOf(action) !== -1) {
-        verb = action;
-      }
-
-      this._layerParams.layers = verb + ':' + layers;
+      identifyRequest.layers('visible');
     }
+
+    identifyRequest.run(callback);
+
+    // set the flags to show the popup
+    this._shouldRenderPopup = true;
+    this._lastClick = e.latlng;
   },
 
-  _parseLayerDefs: function () {
-    if (typeof this._layerParams.layerDefs === 'undefined') {
-      return;
-    }
-
-    var layerDefs = this._layerParams.layerDefs;
-
-    var defs = [];
-
-    if (layerDefs instanceof Array) {
-      var len = layerDefs.length;
-      for (var i = 0; i < len; i++) {
-        if (layerDefs[i]) {
-          defs.push(i + ':' + layerDefs[i]);
-        }
-      }
-    } else if (typeof layerDefs === 'object') {
-      for (var layer in layerDefs) {
-        if(layerDefs.hasOwnProperty(layer)){
-          defs.push(layer + ':' + layerDefs[layer]);
-        }
-      }
-    } else {
-      delete this._layerParams.layerDefs;
-      return;
-    }
-    this._layerParams.layerDefs = defs.join(';');
-  },
-
-  _getImageUrl: function () {
+  _buildExportParams: function () {
     var bounds = this._map.getBounds();
     var size = this._map.getSize();
     var ne = this._map.options.crs.project(bounds._northEast);
     var sw = this._map.options.crs.project(bounds._southWest);
 
-    this._layerParams.bbox = [sw.x, sw.y, ne.x, ne.y].join(',');
-    this._layerParams.size = size.x + ',' + size.y;
+    //ensure that we don't ask ArcGIS Server for a taller image than we have actual map displaying
+    var top = this._map.latLngToLayerPoint(bounds._northEast);
+    var bottom = this._map.latLngToLayerPoint(bounds._southWest);
 
-    if(this.options.token) {
-      this._layerParams.token = this.options.token;
+    if (top.y > 0 || bottom.y < size.y){
+      size.y = bottom.y - top.y;
     }
 
-    var url = this.serviceUrl + 'export' + L.Util.getParamString(this._layerParams);
+    var params = {
+      bbox: [sw.x, sw.y, ne.x, ne.y].join(','),
+      size: size.x + ',' + size.y,
+      dpi: 96,
+      format: this.options.format,
+      transparent: this.options.transparent,
+      bboxSR: this.options.bboxSR,
+      imageSR: this.options.imageSR
+    };
 
-    return url;
+    if(this.options.layers){
+      params.layers = 'show:' + this.options.layers.join(',');
+    }
+
+    if(this.options.layerDefs){
+      params.layerDefs = JSON.stringify(this.options.layerDefs);
+    }
+
+    if(this.options.timeOptions){
+      params.timeOptions = JSON.stringify(this.options.timeOptions);
+    }
+
+    if(this.options.from && this.options.to){
+      params.time = this.options.from.valueOf() + ',' + this.options.to.valueOf();
+    }
+
+    if(this._service.options.token) {
+      params.token = this._service.options.token;
+    }
+
+    return params;
   },
 
-  _update: function (e) {
-    if(this._animatingZoom){
-      return;
+  _requestExport: function (params, bounds) {
+    if(this.options.f === 'json'){
+      this._service.get('export', params, function(error, response){
+        this._renderImage(response.href, bounds);
+      }, this);
+    } else {
+      params.f = 'image';
+      this._renderImage(this.options.url + 'export' + L.Util.getParamString(params), bounds);
     }
-
-    if (this._map._panTransition && this._map._panTransition._inProgress) {
-      return;
-    }
-
-    var zoom = this._map.getZoom();
-
-    if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
-      return;
-    }
-
-    var bounds = this._map.getBounds();
-    bounds._southWest.wrap();
-    bounds._northEast.wrap();
-    var image = new L.ImageOverlay(this._getImageUrl(), bounds, {
-      opacity: 0
-    }).addTo(this._map);
-
-    image.on('load', function(e){
-      var newImage = e.target;
-      var oldImage = this._currentImage;
-
-      if(newImage._bounds.equals(bounds)){
-        this._currentImage = newImage;
-
-        if(this.options.position === "front"){
-          this._currentImage.bringToFront();
-        } else {
-          this._currentImage.bringToBack();
-        }
-
-        this._currentImage.setOpacity(this.options.opacity);
-
-        if(oldImage){
-          this._map.removeLayer(oldImage);
-        }
-        
-        if(this.options.zIndex !== undefined && this.options.zIndex !== null) {
-			this._updateZIndex();
-        }
-      } else {
-        this._map.removeLayer(newImage);
-      }
-    }, this);
-
-
-    this.fire('loading', {
-      bounds: bounds
-    });
   }
 });
 
-L.esri.DynamicMapLayer.include(L.Mixin.Events);
+EsriLeaflet.DynamicMapLayer = EsriLeaflet.Layers.DynamicMapLayer;
 
-L.esri.dynamicMapLayer = function (url, options) {
-  return new L.esri.DynamicMapLayer(url, options);
+EsriLeaflet.Layers.dynamicMapLayer = function(url, options){
+  return new EsriLeaflet.Layers.DynamicMapLayer(url, options);
+};
+
+EsriLeaflet.dynamicMapLayer = function(url, options){
+  return new EsriLeaflet.Layers.DynamicMapLayer(url, options);
 };
