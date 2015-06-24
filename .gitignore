@@ -34,6 +34,10 @@ site/build
 # Built Files
 dist/*
 !dist/README.md
+!dist/esri-leaflet-src.js.map
+!dist/esri-leaflet-src.js
+!dist/esri-leaflet.js.map
+!dist/esri-leaflet.js
 
 # Custom Gruntfile (for custom builds)
 Gruntfile.custom.js

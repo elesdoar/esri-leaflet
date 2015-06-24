@@ -99,6 +99,12 @@ EsriLeaflet.Layers.RasterLayer =  L.Class.extend({
     return this;
   },
 
+  setZIndex: function (zIndex) {
+    this.options.zIndex = zIndex;
+    this._updateZIndex();
+    return this;
+  },
+
   getAttribution: function () {
     return this.options.attribution;
   },
@@ -132,6 +138,12 @@ EsriLeaflet.Layers.RasterLayer =  L.Class.extend({
   authenticate: function(token){
     this._service.authenticate(token);
     return this;
+  },
+
+  _updateZIndex: function () {
+    if (this._currentImage && this._currentImage._image && this.options.zIndex !== undefined) {
+      this._currentImage._image.style.zIndex = this.options.zIndex;
+    }
   },
 
   _renderImage: function(url, bounds){
