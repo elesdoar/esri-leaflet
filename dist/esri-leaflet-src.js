@@ -1,4 +1,4 @@
-/*! esri-leaflet - v1.0.0-rc.8 - 2015-06-24
+/*! esri-leaflet - v1.0.0-rc.8 - 2015-06-25
 *   Copyright (c) 2015 Environmental Systems Research Institute, Inc.
 *   Apache License*/
 (function (factory) {
@@ -1908,6 +1908,10 @@ EsriLeaflet.Layers.RasterLayer =  L.Class.extend({
 
           if(oldImage && oldImage._map){
             oldImage._map.removeLayer(oldImage);
+          }
+
+          if(this.options.zIndex !== undefined && this.options.zIndex !== null) {
+            this._updateZIndex();
           }
         } else {
           this._map.removeLayer(newImage);

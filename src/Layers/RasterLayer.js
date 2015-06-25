@@ -186,6 +186,10 @@ EsriLeaflet.Layers.RasterLayer =  L.Class.extend({
           if(oldImage && oldImage._map){
             oldImage._map.removeLayer(oldImage);
           }
+
+          if(this.options.zIndex !== undefined && this.options.zIndex !== null) {
+            this._updateZIndex();
+          }
         } else {
           this._map.removeLayer(newImage);
         }
