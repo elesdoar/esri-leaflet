@@ -47,7 +47,6 @@ Option | Type | Default | Description
 `useCors` | `Boolean` | `true` | If this service should use CORS when making GET requests.
 `renderingRule` | `Object` | `undefined` | A JSON representation of a [raster function](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Raster_function_objects/02r3000000rv000000/)
 `mosaicRule` | `Object` | `undefined` | A JSON representation of a [mosaic rule](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Mosaic_rule_objects/02r3000000s4000000/)
-`pane` | `String` | `overlayPane` | The map pane to render on.
 
 ### Methods
 
@@ -230,7 +229,7 @@ var map = L.map('map').setView([43.50, -120.23], 7);
 
 L.esri.basemapLayer('Imagery').addTo(map);
 
-L.esri.imageMapLayer({url: 'http://imagery.oregonexplorer.info/arcgis/rest/services/NAIP_2011/NAIP_2011_Dynamic/ImageServer'})
+L.esri.imageMapLayer('http://imagery.oregonexplorer.info/arcgis/rest/services/NAIP_2011/NAIP_2011_Dynamic/ImageServer')
       .setBandIds('3,0,1')
       .addTo(map);
 ```

@@ -23,9 +23,7 @@ describe('L.esri.Layers.FeatureGrid', function () {
       cellEnter: sinon.spy(),
       cellLeave: sinon.spy()
     });
-    grid = new MockGrid({
-      cellSize: 512
-    });
+    grid = new MockGrid();
     map = createMap();
     clock = sinon.useFakeTimers();
   });
@@ -36,7 +34,7 @@ describe('L.esri.Layers.FeatureGrid', function () {
   });
 
   it('should create cells based on the view of the map', function(){
-    map.setView([0,0], 1);
+    map.setView([0,0,], 1);
     grid.addTo(map);
     expect(grid.createCell.getCall(0).args[1].equals(L.point([0,0]))).to.equal(true);
   });
@@ -46,13 +44,15 @@ describe('L.esri.Layers.FeatureGrid', function () {
     grid.addTo(map);
     map.zoomIn();
     clock.tick(1000);
-
     expect(grid.cellLeave.getCall(0).args[1].equals(L.point([0,0,1]))).to.equal(true);
+    expect(grid.cellLeave.getCall(1).args[1].equals(L.point([1,0,1]))).to.equal(true);
+    expect(grid.cellLeave.getCall(2).args[1].equals(L.point([0,1,1]))).to.equal(true);
+    expect(grid.cellLeave.getCall(3).args[1].equals(L.point([1,1,1]))).to.equal(true);
 
-    expect(grid.createCell.getCall(1).args[1].equals(L.point([0,0,2]))).to.equal(true);
-    expect(grid.createCell.getCall(2).args[1].equals(L.point([1,0,2]))).to.equal(true);
-    expect(grid.createCell.getCall(3).args[1].equals(L.point([0,1,2]))).to.equal(true);
-    expect(grid.createCell.getCall(4).args[1].equals(L.point([1,1,2]))).to.equal(true);
+    expect(grid.createCell.getCall(4).args[1].equals(L.point([0,0,2]))).to.equal(true);
+    expect(grid.createCell.getCall(5).args[1].equals(L.point([1,0,2]))).to.equal(true);
+    expect(grid.createCell.getCall(6).args[1].equals(L.point([0,1,2]))).to.equal(true);
+    expect(grid.createCell.getCall(7).args[1].equals(L.point([1,1,2]))).to.equal(true);
   });
 
   it('should create cells when the map is panned', function(){
@@ -60,7 +60,7 @@ describe('L.esri.Layers.FeatureGrid', function () {
 
     grid.addTo(map);
 
-    map.panBy([512,512], {
+    map.panBy([256,256], {
       animate: false,
       duration: 0
     });

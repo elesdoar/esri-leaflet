@@ -1,20 +1,14 @@
-import { Service } from './Service.js';
-import identifyImage from '../Tasks/IdentifyImage.js';
-import query from '../Tasks/Query.js';
-
-export var ImageService = Service.extend({
+EsriLeaflet.Services.ImageService = EsriLeaflet.Services.Service.extend({
 
   query: function () {
-    return query(this);
+    return new EsriLeaflet.Tasks.Query(this);
   },
 
-  identify: function () {
-    return identifyImage(this);
+  identify: function() {
+    return new EsriLeaflet.Tasks.IdentifyImage(this);
   }
 });
 
-export function imageService (options) {
-  return new ImageService(options);
-}
-
-export default imageService;
+EsriLeaflet.Services.imageService = function(params){
+  return new EsriLeaflet.Services.ImageService(params);
+};

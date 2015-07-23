@@ -1,16 +1,8 @@
-import { Task } from './Task.js';
-
-export var Identify = Task.extend({
+EsriLeaflet.Tasks.Identify = EsriLeaflet.Tasks.Task.extend({
   path: 'identify',
 
-  between: function (start, end) {
+  between: function(start, end){
     this.params.time = [start.valueOf(), end.valueOf()];
     return this;
   }
 });
-
-export function identify (options) {
-  return new Identify(options);
-}
-
-export default identify;

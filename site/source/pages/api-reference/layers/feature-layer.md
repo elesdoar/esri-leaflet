@@ -143,16 +143,6 @@ You can create a new empty feature service with a single layer on the [ArcGIS fo
             <td><code>Boolean</code></td>
             <td>If this service should use CORS when making GET requests.</td>
         </tr>
-        <tr>
-            <td><code>renderer</code></td>
-            <td><code>L.svg</code> or <code>L.canvas</code></td>
-            <td>The vector renderer to use to draw the service. Usually `L.svg` but setting to `L.canvas` contains performance benefits for large polygon layers..</td>
-        </tr>
-        <tr>
-            <td><code>pane</code></td>
-            <td><code>String</code></td>
-            <td>The map pane to render on. Usually `overlayPane` for vectors and `markerPane` for markers.</td>
-        </tr>
     </tbody>
 </table>
 
@@ -341,5 +331,5 @@ var map = L.map('map').setView([45.53,-122.64], 14);
 
 L.esri.basemapLayer("Streets").addTo(map);
 
-var busStops = L.esri.featureLayer({url: 'http://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/stops/FeatureServer/0/'}).addTo(map);
+var busStops = L.esri.featureLayer('http://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/stops/FeatureServer/0/').addTo(map);
 ```
