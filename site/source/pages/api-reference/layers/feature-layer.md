@@ -36,8 +36,8 @@ You can create a new empty feature service with a single layer on the [ArcGIS fo
     </thead>
     <tbody>
         <tr>
-            <td><code class="nobr">new L.esri.Layers.FeatureLayer({{{param 'String' 'url'}}}, {{{param 'Object' 'options'}}})</code><br><br><code class="nobr">L.esri.Layers.featureLayer({{{param 'String' 'url'}}}, {{{param 'Object' 'options'}}})</code><br><br><code class="nobr">new L.esri.FeatureLayer({{{param 'String' 'url'}}}, {{{param 'Object' 'options'}}})</code><br><br><code class="nobr">L.esri.featureLayer({{{param 'String' 'url'}}}, {{{param 'Object' 'options'}}})</code></td>
-            <td><code>url</code> URL of the Feature Layer.</td>
+            <td><code class="nobr">L.esri.featureLayer({{{param 'Object' 'options'}}})</code></td>
+            <td>You must pass a <code>url</code> to a [Feature Layer](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Layer/02r3000000w6000000/) in your <code>options</code></td>
         </tr>
     </tbody>
 </table>
@@ -53,6 +53,11 @@ You can create a new empty feature service with a single layer on the [ArcGIS fo
         </tr>
     </thead>
     <tbody>
+        <tr>
+          <td><code>url</code></td>
+          <td><code>String</code></td>
+          <td><strong>Required</strong> The URL to the [Feature Layer](http://resources.arcgis.com/en/help/arcgis-rest-api/#/Layer/02r3000000w6000000/).</td>
+        </tr>
         <tr>
             <td><code>pointToLayer({{{param 'GeoJSON Feature' 'feature' 'http://geojson.org/geojson-spec.html#feature-objects'}}}, {{{param 'LatLng' 'latlng' 'http://leafletjs.com/reference.html#latlng'}}})</code></td>
             <td><code>Function</code></td>
@@ -126,7 +131,7 @@ You can create a new empty feature service with a single layer on the [ArcGIS fo
         <tr>
             <td><code>token</code></td>
             <td><code>String</code></td>
-            <td>If you pass a token in your options it will included in all requests to the service. See [working with authenticated services](#working-with-authenticated-services) for more information.</td>
+            <td>If you pass a token in your options it will be included in all requests to the service.</td>
         </tr>
         <tr>
             <td><code>proxy</code></td>
@@ -137,6 +142,16 @@ You can create a new empty feature service with a single layer on the [ArcGIS fo
             <td><code>useCors</code></td>
             <td><code>Boolean</code></td>
             <td>If this service should use CORS when making GET requests.</td>
+        </tr>
+        <tr>
+            <td><code>renderer</code></td>
+            <td><code>L.svg</code> or <code>L.canvas</code></td>
+            <td>The vector renderer to use to draw the service. Usually `L.svg` but setting to `L.canvas` contains performance benefits for large polygon layers..</td>
+        </tr>
+        <tr>
+            <td><code>pane</code></td>
+            <td><code>String</code></td>
+            <td>The map pane to render on. Usually `overlayPane` for vectors and `markerPane` for markers.</td>
         </tr>
     </tbody>
 </table>
@@ -326,5 +341,5 @@ var map = L.map('map').setView([45.53,-122.64], 14);
 
 L.esri.basemapLayer("Streets").addTo(map);
 
-var busStops = L.esri.featureLayer('http://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/stops/FeatureServer/0/').addTo(map);
+var busStops = L.esri.featureLayer({url: 'http://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/stops/FeatureServer/0/'}).addTo(map);
 ```

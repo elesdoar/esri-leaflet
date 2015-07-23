@@ -5,7 +5,9 @@ describe('L.esri.Layers.TiledMapLayer', function () {
 
   beforeEach(function(){
     server = sinon.fakeServer.create();
-    layer = L.esri.tiledMapLayer(url);
+    layer = L.esri.tiledMapLayer({
+      url: url
+    });
   });
 
   afterEach(function(){
@@ -17,22 +19,24 @@ describe('L.esri.Layers.TiledMapLayer', function () {
   });
 
   it('will modify url for tiles.arcgis.com services', function () {
-    var layer = L.esri.tiledMapLayer('http://tiles.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer');
+    var layer = L.esri.tiledMapLayer({
+      url: 'http://tiles.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer'
+    });
     expect(layer.tileUrl).to.equal('http://tiles{s}.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer/tile/{z}/{y}/{x}');
     expect(layer.options.subdomains).to.deep.equal(['1','2','3','4']);
   });
 
   it('should expose the authenticate method on the underlying service', function(){
-    var spy = sinon.spy(layer._service, 'authenticate');
+    var spy = sinon.spy(layer.service, 'authenticate');
     layer.authenticate('foo');
     expect(spy).to.have.been.calledWith('foo');
   });
 
   it('should expose the query method on the underlying service', function(){
-    var spy = sinon.spy(layer._service, 'identify');
+    var spy = sinon.spy(layer.service, 'identify');
     var identify = layer.identify();
     expect(identify).to.be.an.instanceof(L.esri.Tasks.IdentifyFeatures);
-    expect(identify._service).to.equal(layer._service);
+    expect(identify._service).to.equal(layer.service);
   });
 
   it('should propagate events from the service', function(){
@@ -55,12 +59,15 @@ describe('L.esri.Layers.TiledMapLayer', function () {
   });
 
   it('should have a L.esri.Layers.tiledMapLayer alias', function(){
-    layer = L.esri.Layers.tiledMapLayer(url);
+    layer = L.esri.Layers.tiledMapLayer({
+      url: url
+    });
     expect(layer).to.be.instanceof(L.esri.Layers.TiledMapLayer);
   });
 
   it('should use a token passed in options', function(){
-    layer = L.esri.tiledMapLayer(url, {
+    layer = L.esri.tiledMapLayer({
+      url: url,
       token: 'foo'
     });
 
@@ -68,7 +75,9 @@ describe('L.esri.Layers.TiledMapLayer', function () {
   });
 
   it('should use a token passed with authenticate()', function(){
-    layer = L.esri.tiledMapLayer(url);
+    layer = L.esri.tiledMapLayer({
+      url: url
+    });
 
     layer.authenticate('foo');
 
@@ -76,7 +85,8 @@ describe('L.esri.Layers.TiledMapLayer', function () {
   });
 
   it('should reauthenticate with a token authenticate()', function(){
-    layer = L.esri.tiledMapLayer(url, {
+    layer = L.esri.tiledMapLayer({
+      url: url,
       token: 'foo'
     });
 

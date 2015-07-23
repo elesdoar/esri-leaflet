@@ -20,13 +20,13 @@ layout: documentation.hbs
     </thead>
     <tbody>
         <tr>
-            <td><code class='nobr'>new L.esri.Tasks.Query({{{param 'FeatureLayer' 'endpoint' '../../api-reference/services/feature-layer.html'}}})</code><br><br>
+            <td>
+            <code>L.esri.Tasks.query({{{param 'Object' 'options'}}})</code><br><br>
             <code>L.esri.Tasks.query({{{param 'FeatureLayer' 'endpoint' '../../api-reference/services/feature-layer.html'}}})</code><br><br>
-            <code class='nobr'>new L.esri.Tasks.Query({{{param 'MapService' 'endpoint' '../../api-reference/services/map-service.html'}}})</code><br><br>
             <code>L.esri.Tasks.query({{{param 'MapService' 'endpoint' '../../api-reference/services/map-service.html'}}})</code><br><br>
-            <code>new L.esri.Tasks.Query({{{param 'Object' 'options'}}})</code><br><br>
-            <code>L.esri.Tasks.query({{{param 'Object' 'options'}}})</code></td>
-            <td>Accepts either an `options` object or an instance of <a href="{{assets}}/api-reference/services/map-service.html">MapService</a> or <a href="{{assets}}/api-reference/layers/feature-layer.html">FeatureLayer</a>.</td>
+            <code>L.esri.Tasks.query({{{param 'ImageService' 'endpoint' '../../api-reference/services/image-service.html'}}})</code>
+            </td>
+            <td>Accepts either an `options` object or an instance of <a href="{{assets}}/api-reference/services/map-service.html">MapService</a>, <a href="{{assets}}/api-reference/services/feature-layer-service.html">FeatureLayer</a> or <a href="{{assets}}/api-reference/service/image-service.html">ImageService</a>.</td>
         </tr>
     </tbody>
 </table>
@@ -53,22 +53,22 @@ layout: documentation.hbs
         <tr>
             <td><code>within({{{param 'Geometry' 'geometry'}}})</code></td>
             <td><code>this</code></td>
-            <td>Queries features from the service within (fully contained by) the passed geometry object. `geometry` can be an instance of `L.Marker`, `L.Polygon`, `L.Polyline`, `L.LatLng`, `L.LatLngBounds` and `L.GeoJSON`. It can also accept valid GeoJSON Point, Polyline, Polygon objects and GeoJSON Feature objects containing Point, Polyline, Polygon.</td>
+            <td>Queries features from the service within (fully contained by) the passed geometry object. `geometry` can be an instance of [`L.Marker`](http://leafletjs.com/reference.html#marker), [`L.Polygon`](http://leafletjs.com/reference.html#polygon), [`L.Polyline`](http://leafletjs.com/reference.html#polyline), [`L.LatLng`](http://leafletjs.com/reference.html#latlng), [`L.LatLngBounds`](http://leafletjs.com/reference.html#latlngbounds) and [`L.GeoJSON`](http://leafletjs.com/reference.html#geojson). It can also accept valid GeoJSON [Point](http://geojson.org/geojson-spec.html#point), [Polyline](http://geojson.org/geojson-spec.html#polyline), [Polygon](http://geojson.org/geojson-spec.html#polygon) objects and GeoJSON [Feature objects](http://geojson.org/geojson-spec.html#feature-objects) containing Point, Polyline, Polygon.</td>
         </tr>
         <tr>
             <td><code>contains({{{param 'Geometry' 'geometry'}}})</code></td>
             <td><code>this</code></td>
-            <td>Queries features from the service that fully contain the passed geometry object. `geometry` can be an instance of `L.Marker`, `L.Polygon`, `L.Polyline`, `L.LatLng`, `L.LatLngBounds` and `L.GeoJSON`. It can also accept valid GeoJSON Point, Polyline, Polygon objects and GeoJSON Feature objects containing Point, Polyline, Polygon.</td>
+            <td>Queries features from the service that fully contain the passed geometry object. `geometry` can be an instance of [`L.Marker`](http://leafletjs.com/reference.html#marker), [`L.Polygon`](http://leafletjs.com/reference.html#polygon), [`L.Polyline`](http://leafletjs.com/reference.html#polyline), [`L.LatLng`](http://leafletjs.com/reference.html#latlng), [`L.LatLngBounds`](http://leafletjs.com/reference.html#latlngbounds) and [`L.GeoJSON`](http://leafletjs.com/reference.html#geojson). It can also accept valid GeoJSON [Point](http://geojson.org/geojson-spec.html#point), [Polyline](http://geojson.org/geojson-spec.html#polyline), [Polygon](http://geojson.org/geojson-spec.html#polygon) objects and GeoJSON [Feature objects](http://geojson.org/geojson-spec.html#feature-objects) containing Point, Polyline, Polygon.</td>
         </tr>
         <tr>
             <td><code>intersects({{{param 'Geometry' 'geometry'}}})</code></td>
             <td><code>this</code></td>
-            <td>Queries features from the service that intersect (touch anywhere) the passed geometry object. `geometry` can be an instance of `L.Marker`, `L.Polygon`, `L.Polyline`, `L.LatLng`, `L.LatLngBounds` and `L.GeoJSON`. It can also accept valid GeoJSON Point, Polyline, Polygon objects and GeoJSON Feature objects containing Point, Polyline, Polygon.</td>
+            <td>Queries features from the service that intersect (touch anywhere) the passed geometry object. `geometry` can be an instance of [`L.Marker`](http://leafletjs.com/reference.html#marker), [`L.Polygon`](http://leafletjs.com/reference.html#polygon), [`L.Polyline`](http://leafletjs.com/reference.html#polyline), [`L.LatLng`](http://leafletjs.com/reference.html#latlng), [`L.LatLngBounds`](http://leafletjs.com/reference.html#latlngbounds) and [`L.GeoJSON`](http://leafletjs.com/reference.html#geojson). It can also accept valid GeoJSON [Point](http://geojson.org/geojson-spec.html#point), [Polyline](http://geojson.org/geojson-spec.html#polyline), [Polygon](http://geojson.org/geojson-spec.html#polygon) objects and GeoJSON [Feature objects](http://geojson.org/geojson-spec.html#feature-objects) containing Point, Polyline, Polygon.</td>
         </tr>
         <tr>
             <td><code>overlap({{{param 'Geometry' 'geometry'}}})</code></td>
             <td><code>this</code></td>
-            <td>Queries features from the service that overlap (touch but are not fully contained by) the passed geometry object. `geometry` can be an instance of `L.Marker`, `L.Polygon`, `L.Polyline`, `L.LatLng`, `L.LatLngBounds` and `L.GeoJSON`. It can also accept valid GeoJSON Point, Polyline, Polygon objects and GeoJSON Feature objects containing Point, Polyline, Polygon.</td>
+            <td>Queries features from the service that overlap (touch but are not fully contained by) the passed geometry object. `geometry` can be an instance of [`L.Marker`](http://leafletjs.com/reference.html#marker), [`L.Polygon`](http://leafletjs.com/reference.html#polygon), [`L.Polyline`](http://leafletjs.com/reference.html#polyline), [`L.LatLng`](http://leafletjs.com/reference.html#latlng), [`L.LatLngBounds`](http://leafletjs.com/reference.html#latlngbounds) and [`L.GeoJSON`](http://leafletjs.com/reference.html#geojson). It can also accept valid GeoJSON [Point](http://geojson.org/geojson-spec.html#point), [Polyline](http://geojson.org/geojson-spec.html#polyline), [Polygon](http://geojson.org/geojson-spec.html#polygon) objects and GeoJSON [Feature objects](http://geojson.org/geojson-spec.html#feature-objects) objects containing Point, Polyline, Polygon.</td>
         </tr>
         <tr>
             <td><code>nearby({{{param 'LatLng' 'latlng' 'http://leafletjs.com/reference.html#latlng'}}}, {{{param 'Integer' 'distance'}}})</code></td>
@@ -158,7 +158,7 @@ layout: documentation.hbs
         <tr>
             <td><code>bounds({{{param 'Function' 'callback'}}}, {{{param 'Object' 'context'}}})</code></td>
             <td><code>this</code></td>
-            <td>Executes the query request with the current parameters, passing only the <a href="http://leafletjs.com/reference.html#latlngbounds"><code>LatLngBounds</code></a> of all features matching the query in the <code>callback</code>. Accepts an optional function context.  <small>Only available for Feature Layers hosted on ArcGIS Online or ArcGIS Server 10.3.</small></td>
+            <td>Executes the query request with the current parameters, passing only the <a href="http://leafletjs.com/reference.html#latlngbounds"><code>LatLngBounds</code></a> of all features matching the query in the <code>callback</code>. Accepts an optional function context.  <small>Only available for Feature Layers hosted on ArcGIS Online or ArcGIS Server 10.3.1.</small></td>
         </tr>
     </tbody>
 </table>
