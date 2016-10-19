@@ -1,5 +1,6 @@
-describe('L.esri.Layers.FeatureLayer', function () {
-  function createMap(){
+/* eslint-env mocha */
+describe('L.esri.FeatureLayer', function () {
+  function createMap () {
     // create container
     var container = document.createElement('div');
 
@@ -18,17 +19,17 @@ describe('L.esri.Layers.FeatureLayer', function () {
   var layer;
   var map = createMap();
   var features = [{
-        type: 'Feature',
-        id: 1,
-        geometry: {
-          type: 'LineString',
-          coordinates: [[-122, 45], [-121, 40]]
-        },
-        properties: {
-          time: new Date('January 1 2014').valueOf(),
-          type: 'good'
-        }
-      },{
+    type: 'Feature',
+    id: 1,
+    geometry: {
+      type: 'LineString',
+      coordinates: [[-122, 45], [-121, 40]]
+    },
+    properties: {
+      time: new Date('January 1 2014').valueOf(),
+      type: 'good'
+    }
+  }, {
     type: 'Feature',
     id: 2,
     geometry: {
@@ -41,59 +42,35 @@ describe('L.esri.Layers.FeatureLayer', function () {
     }
   }];
 
-  var pointFeatures = [({
-        type: 'Feature',
-        id: 1,
-        geometry: {
-          type: 'Point',
-          coordinates: [-122, 45]
-        },
-        properties: {
-          time: new Date('January 1 2014').valueOf(),
-          type: 'good'
-        }
-      }),{
+  var multiPolygon = [({
     type: 'Feature',
-    id: 2,
+    id: 1,
     geometry: {
-      type: 'Point',
-      coordinates: [-123, 46]
+      type: 'MultiPolygon',
+      coordinates: [[[[-95, 43], [-95, 50], [-90, 50], [-91, 42], [-95, 43]]], [[[-89, 42], [-89, 50], [-80, 50], [-80, 42]]]]
     },
     properties: {
-      time: new Date('Febuary 1 2014').valueOf(),
-      type: 'bad'
+      time: new Date('Febuary 1 2014').valueOf()
     }
-  }];
-
-  var multiPolygon = [({
-      type : 'Feature',
-      id: 1,
-      geometry: {
-        type: 'MultiPolygon',
-        coordinates: [[[[-95, 43], [-95, 50], [-90, 50], [-91, 42], [-95, 43]]], [[[-89, 42], [-89, 50], [-80, 50], [-80, 42]]]]
-      },
-      properties: {
-        time: new Date('Febuary 1 2014').valueOf()
-      }
   })];
 
   var point = [({
-      type : 'Feature',
-      id: 1,
-      geometry: {
-        type: 'Point',
-        coordinates: [-95, 43]
-      },
-      properties: {
-        time: new Date('Febuary 1 2014').valueOf()
-      }
+    type: 'Feature',
+    id: 1,
+    geometry: {
+      type: 'Point',
+      coordinates: [-95, 43]
+    },
+    properties: {
+      time: new Date('Febuary 1 2014').valueOf()
+    }
   })];
 
-  beforeEach(function(){
+  beforeEach(function () {
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
       timeField: 'time',
-      pointToLayer: function(feature, latlng){
+      pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, {
           color: 'green'
         });
@@ -103,16 +80,16 @@ describe('L.esri.Layers.FeatureLayer', function () {
     layer.createLayers(features);
   });
 
-  it('should fire a createfeature event', function(done){
+  it('should fire a createfeature event', function (done) {
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
       timeField: 'time',
-      pointToLayer: function(feature, latlng){
+      pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng);
       }
     }).addTo(map);
 
-    layer.on('createfeature', function(e){
+    layer.on('createfeature', function (e) {
       expect(e.feature.id).to.equal(2);
       done();
     });
@@ -120,47 +97,87 @@ describe('L.esri.Layers.FeatureLayer', function () {
     layer.createLayers(features);
   });
 
-  it('should have an alias at L.esri.Layers.featureLayer', function(){
-    var layer = L.esri.Layers.featureLayer({
+  it('should have an alias at L.esri.featureLayer', function () {
+    var layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0'
     });
-    expect(layer).to.be.an.instanceof(L.esri.Layers.FeatureLayer);
+    expect(layer).to.be.an.instanceof(L.esri.FeatureLayer);
   });
 
-  it('should create features on a map', function(){
+  it('should create features on a map', function () {
     expect(map.hasLayer(layer.getFeature(1))).to.equal(true);
     expect(map.hasLayer(layer.getFeature(2))).to.equal(true);
   });
 
-  it('should remove features on a map', function(){
+  it('should remove features on a map', function () {
     layer.removeLayers([1]);
     expect(map.hasLayer(layer.getFeature(1))).to.equal(false);
     expect(map.hasLayer(layer.getFeature(2))).to.equal(true);
   });
 
-  it('should fire a removefeature event', function(){
-    layer.on('removefeature', function(e){
+  it('should fire a removefeature event', function () {
+    layer.on('removefeature', function (e) {
       expect(e.feature.id).to.equal(1);
     });
     layer.removeLayers([1]);
   });
 
-  it('should add features back to a map', function(){
+  it('should fire a removefeature event when the featureLayer is removed from the map', function (done) {
+    layer = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      timeField: 'time',
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng);
+      }
+    }).addTo(map);
+
+    layer.createLayers(features);
+
+    layer.on('removefeature', function (e) {
+      expect(e.feature.id).to.equal(2);
+      done();
+    });
+
+    map.removeLayer(layer);
+  });
+
+  it('should add features back to a map', function () {
     layer.removeLayers([1]);
     layer.addLayers([1]);
     expect(map.hasLayer(layer.getFeature(1))).to.equal(true);
     expect(map.hasLayer(layer.getFeature(2))).to.equal(true);
   });
 
-  it('should fire a addfeature event', function(){
-    layer.on('addfeature', function(e){
+  it('should fire a addfeature event', function () {
+    layer.on('addfeature', function (e) {
       expect(e.feature.id).to.equal(1);
     });
     layer.removeLayers([1]);
     layer.addLayers([1]);
   });
 
-  it('should not add features outside the time range', function(){
+  it('should fire an addfeature event when a featureLayer is readded to the map', function (done) {
+    layer = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      timeField: 'time',
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng);
+      }
+    }).addTo(map);
+
+    layer.createLayers(features);
+    map.removeLayer(layer);
+
+    layer.on('addfeature', function (e) {
+      expect(e.feature.id).to.equal(2);
+      done();
+    });
+
+    map.addLayer(layer);
+    layer.createLayers(features);
+  });
+
+  it('should not add features outside the time range', function () {
     layer.setTimeRange(new Date('January 1 2014'), new Date('Febuary 1 2014'));
 
     layer.createLayers([{
@@ -180,74 +197,40 @@ describe('L.esri.Layers.FeatureLayer', function () {
     expect(map.hasLayer(layer.getFeature(3))).to.equal(false);
   });
 
-  it('should be able to add itself to a map', function(){
+  it('should be able to add itself to a map', function () {
     layer.addTo(map);
 
     expect(map.hasLayer(layer)).to.equal(true);
   });
 
-  it('should be remove itself from a map', function(){
+  it('should be remove itself from a map', function () {
     layer.addTo(map);
     map.removeLayer(layer);
 
     expect(map.hasLayer(layer)).to.equal(false);
   });
 
-  it('should bind popups to existing features', function(){
-    layer.bindPopup(function(feature){
-      return 'ID: ' + feature.id;
-    });
-    expect(layer.getFeature(1)._popup.getContent()).to.equal('ID: 1');
-    expect(layer.getFeature(2)._popup.getContent()).to.equal('ID: 2');
+  it('should iterate over each feature', function () {
+    var spy = sinon.spy();
+    layer.eachFeature(spy);
+    expect(spy.callCount).to.equal(2);
   });
 
-  it('should bind popups to new features', function(){
-    layer.bindPopup(function(feature){
-      return 'ID: ' + feature.id;
-    });
-
-    layer.createLayers([{
-      type: 'Feature',
-      id: 3,
-      geometry: {
-        type: 'Point',
-        coordinates: [-123, 46]
-      },
-      properties: {
-        time: new Date('Febuary 24 2014').valueOf()
-      }
-    }]);
-
-    expect(layer.getFeature(3)._popup.getContent()).to.equal('ID: 3');
+  it('should run a function against every feature', function () {
+    var spy = sinon.spy();
+    layer = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      onEachFeature: spy
+    }).addTo(map);
+    layer.createLayers(features);
+    expect(spy.callCount).to.equal(2);
   });
 
-  it('should preserve popup options when binding popup to new or existing features', function(){
-    layer.bindPopup(function(feature){
-      return 'ID: ' + feature.id;
-    }, {minWidth: 500});
-
-    layer.createLayers([{
-      type: 'Feature',
-      id: 3,
-      geometry: {
-        type: 'Point',
-        coordinates: [-123, 46]
-      },
-      properties: {
-        time: new Date('Febuary 24 2014').valueOf()
-      }
-    }]);
-
-    expect(layer.getFeature(1)._popup.options.minWidth).to.equal(500);
-    expect(layer.getFeature(2)._popup.options.minWidth).to.equal(500);
-    expect(layer.getFeature(3)._popup.options.minWidth).to.equal(500);
-  });
-
-  it('should style L.circleMarker features appropriately', function(){
+  it('should style L.circleMarker features appropriately', function () {
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
       timeField: 'time',
-      pointToLayer: function(feature, latlng){
+      pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, {
           color: 'green'
         });
@@ -258,16 +241,18 @@ describe('L.esri.Layers.FeatureLayer', function () {
     expect(layer.getFeature(1).options.color).to.equal('green');
   });
 
-  it('should unbind popups on features', function(){
-    layer.bindPopup(function(feature){
+  it('should unbind popups on features', function () {
+    layer.bindPopup(function (feature) {
       return 'ID: ' + feature.id;
     });
+
     layer.unbindPopup();
-    expect(layer.getFeature(1)._popup).to.equal(null);
-    expect(layer.getFeature(2)._popup).to.equal(null);
+
+    expect(layer._popup).to.equal(null);
+    expect(layer._popup).to.equal(null);
   });
 
-  it('should unbind popups on multi polygon features', function(){
+  it('should unbind popups on multi polygon features', function () {
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
       timeField: 'time'
@@ -275,15 +260,16 @@ describe('L.esri.Layers.FeatureLayer', function () {
 
     layer.createLayers(multiPolygon);
 
-    layer.bindPopup(function(feature){
+    layer.bindPopup(function (feature) {
       return 'ID: ' + feature.id;
     });
+
     layer.unbindPopup();
-    expect(layer.getFeature(1).getLayers()[0]._popup).to.equal(null);
-    expect(layer.getFeature(1).getLayers()[1]._popup).to.equal(null);
+
+    expect(layer._popup).to.equal(null);
   });
 
-  it('should reset style on multi polygon features', function(){
+  it('should reset style on multi polygon features', function () {
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
       style: {
@@ -293,26 +279,29 @@ describe('L.esri.Layers.FeatureLayer', function () {
 
     layer.createLayers(multiPolygon);
 
-    expect(layer.getFeature(1).getLayers()[0].options.color).to.equal('black');
+    expect(layer.getFeature(1).options.color).to.equal('black');
 
     layer.setFeatureStyle(1, {
       color: 'red'
     });
 
-    expect(layer.getFeature(1).getLayers()[0].options.color).to.equal('red');
+    expect(layer.getFeature(1).options.color).to.equal('red');
 
     layer.resetStyle(1);
 
-    expect(layer.getFeature(1).getLayers()[0].options.color).to.equal('black');
+    expect(layer.getFeature(1).options.color).to.equal('black');
   });
 
-  it('should reset L.circleMarker style', function(){
+  it('should reset L.circleMarker style', function () {
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
-      pointToLayer: function(feature, latlng){
-        return L.circleMarker(latlng, {
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng);
+      },
+      style: function () {
+        return {
           color: 'green'
-        });
+        };
       }
     }).addTo(map);
 
@@ -324,11 +313,11 @@ describe('L.esri.Layers.FeatureLayer', function () {
     });
     expect(layer.getFeature(1).options.color).to.equal('red');
 
-    layer.resetStyle(1);
+    layer.resetFeatureStyle(1);
     expect(layer.getFeature(1).options.color).to.equal('green');
   });
 
-  it('should reset to default style on multi polygon features', function(){
+  it('should reset to default style on multi polygon features', function () {
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0'
     }).addTo(map);
@@ -339,34 +328,34 @@ describe('L.esri.Layers.FeatureLayer', function () {
       color: 'red'
     });
 
-    expect(layer.getFeature(1).getLayers()[0].options.color).to.equal('red');
+    expect(layer.getFeature(1).options.color).to.equal('red');
 
     layer.resetStyle(1);
 
-    expect(layer.getFeature(1).getLayers()[0].options.color).to.equal('#0033ff');
+    expect(layer.getFeature(1).options.color).to.equal('#3388ff');
   });
 
-  it('should draw multi polygon features with a fill', function(){
+  it('should draw multi polygon features with a fill', function () {
     layer = L.esri.featureLayer({
       url: 'http://services.arcgis.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0'
     }).addTo(map);
 
     layer.createLayers(multiPolygon);
 
-    expect(layer.getFeature(1).getLayers()[0].options.fill).to.equal(true);
+    expect(layer.getFeature(1).options.fill).to.equal(true);
 
     layer.resetStyle(1);
 
-    expect(layer.getFeature(1).getLayers()[0].options.color).to.equal('#0033ff');
+    expect(layer.getFeature(1).options.color).to.equal('#3388ff');
   });
 
-  it('should iterate over each feature', function(){
+  it('should iterate over each feature', function () {
     var spy = sinon.spy();
     layer.eachFeature(spy);
     expect(spy.callCount).to.equal(2);
   });
 
-  it('should run a function against every feature', function(){
+  it('should run a function against every feature', function () {
     var spy = sinon.spy();
     layer = L.esri.featureLayer({
       url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
@@ -376,7 +365,7 @@ describe('L.esri.Layers.FeatureLayer', function () {
     expect(spy.callCount).to.equal(2);
   });
 
-  it('should change styles on features with an object', function(){
+  it('should change styles on features with an object', function () {
     layer.setStyle({
       color: 'red'
     });
@@ -389,7 +378,7 @@ describe('L.esri.Layers.FeatureLayer', function () {
       id: 3,
       geometry: {
         type: 'LineString',
-        coordinates: [[-122, 45], [-121, 40]]
+        coordinates: [[-122, 45], [-121, 63]]
       },
       properties: {
         time: new Date('Febuary 24 2014').valueOf()
@@ -399,8 +388,8 @@ describe('L.esri.Layers.FeatureLayer', function () {
     expect(layer.getFeature(3).options.color).to.equal('red');
   });
 
-  it('should change styles on features with a function', function(){
-    layer.setStyle(function(){
+  it('should change styles on features with a function', function () {
+    layer.setStyle(function () {
       return {
         color: 'red'
       };
@@ -414,7 +403,7 @@ describe('L.esri.Layers.FeatureLayer', function () {
       id: 3,
       geometry: {
         type: 'LineString',
-        coordinates: [[-122, 45], [-121, 40]]
+        coordinates: [[-122, 45], [-121, 63]]
       },
       properties: {
         time: new Date('Febuary 24 2014').valueOf()
@@ -424,15 +413,72 @@ describe('L.esri.Layers.FeatureLayer', function () {
     expect(layer.getFeature(3).options.color).to.equal('red');
   });
 
-  it('should propagate events from individual features', function(){
+  it('should propagate events from individual features', function () {
     var spy = sinon.spy();
     layer.on('click', spy);
 
     layer.getFeature(1).fire('click', {
       foo: 'bar'
-    });
+    }, true);
 
     expect(spy.getCall(0).args[0].foo).to.equal('bar');
     expect(spy.getCall(0).args[0].type).to.equal('click');
+  });
+
+  it('should pass renderer through to individual features', function () {
+    var renderer = L.canvas();
+    layer = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      renderer: renderer
+    }).addTo(map);
+
+    layer.createLayers(features);
+
+    expect(layer.getFeature(1).options.renderer).to.equal(renderer);
+  });
+
+  it('should pass pane through to individual features', function () {
+    map.createPane('custom');
+    layer = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      pane: 'custom'
+    }).addTo(map);
+
+    layer.createLayers(features);
+
+    expect(layer.getFeature(1).options.pane).to.equal('custom');
+  });
+
+  it('should not throw uncaught errors when a feature layer is removed from the map', function () {
+    map.createPane('custom');
+    layer = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      pane: 'custom'
+    }).addTo(map);
+
+    layer.createLayers(features);
+    expect(layer._map).to.equal(map);
+
+    map.removeLayer(layer);
+    expect(layer._map).to.not.exist;
+  });
+
+  it('should set the timeout of the service in two different ways', function () {
+    map.createPane('custom');
+    layer = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      pane: 'custom'
+    });
+    expect(layer.service.options.timeout).to.equal(0);
+
+    layer.service.setTimeout(1500);
+    expect(layer.service.options.timeout).to.equal(1500);
+
+    var layer2 = L.esri.featureLayer({
+      url: 'http://gis.example.com/mock/arcgis/rest/services/MockService/MockFeatureServer/0',
+      pane: 'custom',
+      timeout: 1500
+    });
+    expect(layer2.service.options.timeout).to.equal(1500);
   });
 });

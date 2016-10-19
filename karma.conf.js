@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Fri May 30 2014 15:44:45 GMT-0400 (EDT)
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -12,41 +12,17 @@ module.exports = function(config) {
     frameworks: ['mocha', 'chai-sinon'],
 
     // list of files / patterns to load in the browser
+    // not sure why tests are failing when files are loaded in bulk
+
     files: [
       'node_modules/leaflet/dist/leaflet.css',
       'node_modules/leaflet/dist/leaflet-src.js',
-      'src/EsriLeaflet.js',
-      'src/Util.js',
-      'src/Layers/BasemapLayer.js',
-      'src/Layers/RasterLayer.js',
-      'src/Layers/TiledMapLayer.js',
-      'src/Layers/DynamicMapLayer.js',
-      'src/Layers/ImageMapLayer.js',
-      'src/Layers/FeatureLayer/FeatureGrid.js',
-      'src/Layers/FeatureLayer/FeatureManager.js',
-      'src/Layers/FeatureLayer/FeatureLayer.js',
-      'src/Request.js',
-      'src/Services/Service.js',
-      'src/Services/FeatureLayerService.js',
-      'src/Services/MapService.js',
-      'src/Services/ImageService.js',
-      'src/Tasks/Task.js',
-      'src/Tasks/Query.js',
-      'src/Tasks/Identify.js',
-      'src/Tasks/IdentifyFeatures.js',
-      'src/Tasks/IdentifyImage.js',
-      'src/Tasks/Find.js',
-      'src/Controls/Logo.js',
+      'dist/esri-leaflet-debug.js',
+      // these two are the tempermental ones
+      'spec/Layers/ImageMapLayerSpec.js',
+      'spec/Layers/DynamicMapLayerSpec.js',
       'spec/**/*Spec.js'
-      // 'spec/UtilSpec.js',
-      // 'spec/RequestSpec.js',
-      // 'spec/Tasks/*Spec.js',
-      // 'spec/Services/*Spec.js',
-      // 'spec/Layers/**/*Spec.js',
 
-      // 'spec/Layers/ImageMapLayerSpec.js',
-      // 'spec/**/QuerySpec.js',
-      // 'spec/**/FeatureManagerSpec.js'
     ],
 
     // list of files to exclude
@@ -54,12 +30,14 @@ module.exports = function(config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {},
+    preprocessors: {
+      'dist/**/*.js': ['sourcemap', 'coverage']
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['mocha', 'coverage'],
 
     // web server port
     port: 9876,
@@ -77,11 +55,11 @@ module.exports = function(config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: [
-      'Chrome',
+      // 'Chrome',
       // 'ChromeCanary',
       // 'Firefox',
       // 'Safari',
-      // 'PhantomJS'
+      'PhantomJS'
     ],
 
     // Continuous Integration mode
@@ -90,9 +68,19 @@ module.exports = function(config) {
 
     // Configure the coverage reporters
     coverageReporter: {
-      reporters:[
-        {type: 'html', dir:'coverage/'},
-        {type: 'text'}
+      instrumenters: {
+        isparta: require('isparta')
+      },
+      instrumenter: {
+        'src/**/*.js': 'isparta'
+      },
+      reporters: [
+        {
+          type: 'html',
+          dir: 'coverage/'
+        }, {
+          type: 'text'
+        }
       ]
     }
   });

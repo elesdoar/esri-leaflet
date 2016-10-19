@@ -1,4 +1,10 @@
 language: node_js
-before_install: npm install -g grunt-cli
+sudo: false
+notifications:
+  email: false
 node_js:
-  - "0.10"
+  - "4"
+before_script:
+  - npm prune
+before_install:
+  - npm i -g npm@^3.0.0
