@@ -126,6 +126,12 @@ export var RasterLayer = L.Layer.extend({
     return this;
   },
 
+  setZIndex: function (zIndex) {
+    this.options.zIndex = zIndex;
+    this._updateZIndex();
+    return this;
+  },
+
   getTimeRange: function () {
     return [this.options.from, this.options.to];
   },
@@ -196,6 +202,10 @@ export var RasterLayer = L.Layer.extend({
             if (oldImage && oldImage._map) {
               oldImage._map.removeLayer(oldImage);
             }
+
+            if(this.options.zIndex !== undefined && this.options.zIndex !== null) {
+              this._updateZIndex();
+            }
           } else {
             this._map.removeLayer(newImage);
           }
@@ -252,5 +262,11 @@ export var RasterLayer = L.Layer.extend({
   _resetPopupState: function (e) {
     this._shouldRenderPopup = false;
     this._lastClick = e.latlng;
-  }
+  },
+
+  _updateZIndex: function () {
+    if (this._currentImage && this._currentImage._image && this.options.zIndex !== undefined) {
+      this._currentImage._image.style.zIndex = this.options.zIndex;
+    }
+  },
 });
