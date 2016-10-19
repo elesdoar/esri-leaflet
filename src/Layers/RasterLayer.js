@@ -203,7 +203,7 @@ export var RasterLayer = L.Layer.extend({
               oldImage._map.removeLayer(oldImage);
             }
 
-            if(this.options.zIndex !== undefined && this.options.zIndex !== null) {
+            if (this.options.zIndex !== undefined && this.options.zIndex !== null) {
               this._updateZIndex();
             }
           } else {
@@ -268,5 +268,5 @@ export var RasterLayer = L.Layer.extend({
     if (this._currentImage && this._currentImage._image && this.options.zIndex !== undefined) {
       this._currentImage._image.style.zIndex = this.options.zIndex;
     }
-  },
+  }
 });
